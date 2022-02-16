@@ -1,10 +1,38 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { ValidarTokenGuard } from './guards/validar-token.guard';
 
-const routes: Routes = [];
+const routes: Routes = [
+
+  {
+    path: 'auth',
+    loadChildren: () => import('./auth/auth.module').then(m => m.AuthModule)
+  },
+  {
+    path: 'dashboard',
+    loadChildren: () => import('./protected/protected.module').then(m => m.ProtectedModule),
+    canActivate: [ ValidarTokenGuard ],
+    canLoad: [ ValidarTokenGuard ]
+  },
+  {
+    path: '**',
+    redirectTo: 'auth'
+  }
+
+];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
+  imports: [
+    /**
+     * La siguiente manera de declarar los imports de las rutas sirve para agregar un # al URL del navegador
+     * esto sirve para tener compatibilidad con navegadores antiguos
+     */
+    // RouterModule.forRoot(routes, {
+    //   useHash: true
+    // })],
+    RouterModule.forRoot(routes, {
+      useHash: false
+    })],
   exports: [RouterModule]
 })
 export class AppRoutingModule { }
